@@ -10,7 +10,9 @@ def estimate_gaussian(X):
     ####################################################################
     #               YOUR CODE HERE                                     #
     ####################################################################
-    
+    mu = np.mean(X,axis=0)
+    var = np.var(X,axis=0,ddof=0)
+    print mu.shape, var.shape
     ####################################################################
     #               END YOUR CODE                                      #
     ####################################################################
@@ -32,9 +34,21 @@ def select_threshold(yval,pval):
         ####################################################################
         #                 YOUR CODE HERE                                   #
         ####################################################################
-        
-        bestF1 = 0
-
+        tp = np.sum(np.equal(yval.squeeze(),(pval.T>epsilon)*1.0)*1.0)
+        tn = np.sum(np.equal(yval.squeeze(),(pval.T<epsilon)*1.0)*1.0)
+        fp = np.sum(yval[(yval.squeeze()==0.0) & (pval.T>epsilon)])
+        fn = np.sum(yval[(yval.squeeze()==1.0) & (pval.T<epsilon)])
+        prec = tp/(tp+fp)
+        rec = tp/(tp+fn)
+        F1 = (2.0*prec*rec)/(prec+rec)
+        # print "epsilon",epsilon
+        # print "yval",yval[:10].squeeze()
+        # print "pval",pval[:10],pval[:10].shape
+        # print "middle",np.greater(pval,epsilon)
+        # print "tp",tp[:10]
+        if F1 > bestF1:
+            best_epsilon = epsilon
+            bestF1 = F1
         ####################################################################
         #                 END YOUR CODE                                    #
         ####################################################################

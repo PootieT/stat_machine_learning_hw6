@@ -14,7 +14,9 @@ def find_closest_centroids(X, centroids):
 
     # You need to return the following variable correctly.
     idx = np.zeros((X.shape[0],),dtype=int)
+    m,d = X.shape
 
+    # print "in find closest centroid, X:",X.shape," centroids: ",centroids.shape
     ######################### YOUR CODE HERE ########################################
     # Instructions: Go over every example, find its closest centroid, and store     #
     #               the index in the array idx at the appropriate location.         #
@@ -22,11 +24,10 @@ def find_closest_centroids(X, centroids):
     #               closest to example i. Hence, it should be a value in the        #
     #               range 0..K-1                                                    #
     ################################################################################
-
-    
-    
-
-
+    X_tile = np.repeat(X[:, :, np.newaxis], K, axis=2)
+    centroids_tile = np.repeat(centroids.T[np.newaxis,:,:], m, axis=0) 
+    # print "centroids shape: ",centroids_tile.shape," Xtile shape: ",X_tile.shape
+    idx = np.argmin(np.sum((X_tile - centroids_tile)**2,axis=1),axis=1)
     ################################################################################
     #             END OF YOUR CODE                                                 #
     ################################################################################
@@ -48,20 +49,24 @@ def compute_centroids(X, idx, K):
 
     # You need to return the following variables correctly.
     centroids = np.zeros((K, X.shape[1]))
-
+    m,d = X.shape
     ########################= YOUR CODE HERE ######################################
     # Instructions: Go over every centroid and compute mean of all points that    #
     #               belong to it. Concretely, the row vector centroids[i,:]       #
     #               should contain the mean of the data points assigned to        #
     #               centroid i.                                                   #
     ###############################################################################
-
-   
-
+    idx_oh = np.zeros((m, K))
+    idx_oh[np.arange(m), idx] = 1.0
+    idx_oh_tile = np.repeat(idx_oh[:,np.newaxis,:], d, axis=1)
+    X_tile = np.repeat(X[:,:,np.newaxis], K, axis=2)
+    # print "idx shape: ",idx_oh_tile.shape," Xtile shape: ",X_tile.shape
+    centroids = np.sum(np.multiply(idx_oh_tile, X_tile),axis=0)/np.sum(idx_oh_tile,axis=0)
+    # print "returned centroids: ",centroids.shape
     ################################################################################
     #             END OF YOUR CODE                                                 #
     ################################################################################
-    return centroids
+    return centroids.T
 
 
 def kmeans_init_centroids(X,K):
@@ -74,7 +79,9 @@ def kmeans_init_centroids(X,K):
     #######################= YOUR CODE HERE ######################################
     #  Construct a random permutation of the examples and pick the first K items  #                                              
     ###############################################################################
-    
+    X_copy = X.copy()
+    np.random.shuffle(X_copy)
+    centroids = X[:K,:]
     
     
     ################################################################################
@@ -108,6 +115,7 @@ def run_kmeans(X, initial_centroids, max_iters, plot_progress=False):
     # Initialize values
     m, d  = X.shape;
     K = initial_centroids.shape[0]
+    # print "initial_centroids shape, ",initial_centroids.shape
     centroids = initial_centroids
     previous_centroids = centroids
     idx = np.zeros((m, 1))

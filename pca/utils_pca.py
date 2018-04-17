@@ -9,7 +9,8 @@ def pca(X):
     #########################################################
     #         YOUR CODE HERE                                #
     #########################################################
-    
+    sigma = 1.0/X.shape[0]*(np.dot(X.T,X))
+    U, S, V = np.linalg.svd(sigma,full_matrices = False)
     # compute the covariance of X and then use the
     # svd function to compute the eigenvectors and
     # eigenvalues of the covariance matrix
@@ -37,9 +38,8 @@ def project_data(X,U,K):
     #########################################################
     #         YOUR CODE HERE                                #
     #########################################################
-    
-    
-    
+    Z = np.matmul(X,U[:,:K])
+
     ########################################################
     #           END YOUR CODE                              #
     ########################################################
@@ -58,9 +58,8 @@ def recover_data(Z,U,K):
     #########################################################
     #         YOUR CODE HERE                                #
     #########################################################
-    
-   
-
+    # print Z.shape, U[:K,:].shape
+    X_rec = np.matmul(Z,U[:,:K].T)
     ########################################################
     #           END YOUR CODE                              #
     ########################################################
