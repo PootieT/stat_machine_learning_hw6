@@ -34,21 +34,30 @@ def select_threshold(yval,pval):
         ####################################################################
         #                 YOUR CODE HERE                                   #
         ####################################################################
-        tp = np.sum(np.equal(yval.squeeze(),(pval.T>epsilon)*1.0)*1.0)
-        tn = np.sum(np.equal(yval.squeeze(),(pval.T<epsilon)*1.0)*1.0)
-        fp = np.sum(yval[(yval.squeeze()==0.0) & (pval.T>epsilon)])
-        fn = np.sum(yval[(yval.squeeze()==1.0) & (pval.T<epsilon)])
+        pred = (pval.T>epsilon)*1
+        # tp = np.sum(np.equal(yval,pred)*1.0)
+        tp = np.sum(((yval)&(pred))*1.0)
+        fp = np.sum(np.equal(yval,1-pred)*1.0)
+        fn = np.sum(((yval==1) & (1-pred))*1.0)
         prec = tp/(tp+fp)
         rec = tp/(tp+fn)
         F1 = (2.0*prec*rec)/(prec+rec)
-        # print "epsilon",epsilon
-        # print "yval",yval[:10].squeeze()
-        # print "pval",pval[:10],pval[:10].shape
-        # print "middle",np.greater(pval,epsilon)
-        # print "tp",tp[:10]
+        # print "precision:",prec,"recall:",rec,"F1:",F1
+
+        # # print "epsilon",epsilon
+        # print "yval",yval[:20].squeeze().T
+        # # # print "pval",pval[80:100]
+        # print "pred",pred[:20]
+        # print "true_positive", (((yval==1)&(pred))*1.0)[:20],"and ",np.sum((((yval)&(pred))*1.0)[:20])
+        # print "fals_positive", (np.equal(yval.squeeze(),1-pred)*1.0)[:20],"and ",np.sum((np.equal(yval.squeeze(),1-pred)*1.0)[:20])
+        # print "fals_negative", ((yval.squeeze()==1) & (1-pred)).squeeze().T[:20], "and ",np.sum(((yval.squeeze()==1) & (1-pred)).squeeze().T[:20])
+        # print "precision: ",prec, "recall: ",rec
+        # print "epislon",epsilon,"F1",F1
+        # print " "
         if F1 > bestF1:
             best_epsilon = epsilon
             bestF1 = F1
+            print "best epislon",best_epsilon,"best F1",bestF1
         ####################################################################
         #                 END YOUR CODE                                    #
         ####################################################################

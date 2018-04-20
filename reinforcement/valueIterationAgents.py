@@ -45,7 +45,14 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
+        for i in range(iterations):
+          for state in self.mdp.getStates():
+            print "in main loop iteration:",i,", calculating state:",state
+            bestA = self.computeActionFromValues(state)
+            if bestA is not None:
+              self.values[state] = self.computeQValueFromValues(state, bestA)
 
+        
 
     def getValue(self, state):
         """
@@ -60,7 +67,13 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+        q_val = 0
+        for (nextState, prob) in self.mdp.getTransitionStatesAndProbs(state, action):
+          print "from ",state," to ",nextState,"transition probability:",prob,",reward:", self.mdp.getReward(state,action,nextState),",value:", self.discount*self.getValue(nextState)
+          q_val += prob*(self.mdp.getReward(state,action,nextState) + self.discount*self.getValue(nextState))
+        return q_val
+
 
     def computeActionFromValues(self, state):
         """
@@ -72,7 +85,21 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+        if self.mdp.isTerminal(state):
+          print "found terminal state"
+          return None
+        else:
+          maxQ = -float("inf")
+          bestA = self.mdp.getPossibleActions(state)[0]
+          for action in self.mdp.getPossibleActions(state):
+            q_val = self.computeQValueFromValues(state, action)
+            print "evaluating action:",action,", Q-value:",q_val
+            if q_val > maxQ:
+              maxQ = q_val
+              bestA = action
+          print "best action:",bestA
+          return bestA
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
