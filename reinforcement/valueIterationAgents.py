@@ -46,11 +46,13 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
         for i in range(iterations):
+          temp = self.values.copy()
           for state in self.mdp.getStates():
             print "in main loop iteration:",i,", calculating state:",state
             bestA = self.computeActionFromValues(state)
             if bestA is not None:
-              self.values[state] = self.computeQValueFromValues(state, bestA)
+              temp[state] = self.computeQValueFromValues(state, bestA)
+          self.values = temp
 
         
 
@@ -90,16 +92,20 @@ class ValueIterationAgent(ValueEstimationAgent):
           print "found terminal state"
           return None
         else:
-          maxQ = -float("inf")
-          bestA = self.mdp.getPossibleActions(state)[0]
+          # maxQ = -float("inf")
+          # bestA = self.mdp.getPossibleActions(state)[0]
+          # for action in self.mdp.getPossibleActions(state):
+          #   q_val = self.computeQValueFromValues(state, action)
+          #   print "evaluating action:",action,", Q-value:",q_val
+          #   if q_val > maxQ:
+          #     maxQ = q_val
+          #     bestA = action
+          # print "best action:",bestA
+          # return bestA
+          a_q_counter = util.Counter()
           for action in self.mdp.getPossibleActions(state):
-            q_val = self.computeQValueFromValues(state, action)
-            print "evaluating action:",action,", Q-value:",q_val
-            if q_val > maxQ:
-              maxQ = q_val
-              bestA = action
-          print "best action:",bestA
-          return bestA
+          	a_q_counter[action] = self.computeQValueFromValues(state, action)
+      	  return a_q_counter.argMax()
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
